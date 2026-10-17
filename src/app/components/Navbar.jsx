@@ -586,7 +586,7 @@ export default function Navbar() {
 
           <div className="montasir-navbar__actions">
             <a
-              href="/Montasir_Islam_Job_Market_Resume(1).pdf"
+               href="https://drive.google.com/uc?export=download&id=1pvEHDLrnJa9uUxgIKj_KPdgXxQUkWBvG"
               download="Montasir_Islam_Resume.pdf"
               className="montasir-navbar__resume"
               aria-label="Download my resume"
