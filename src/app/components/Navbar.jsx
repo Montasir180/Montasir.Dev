@@ -6,7 +6,18 @@ import Link from "next/link";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Close mobile menu when pressing Escape
+  const navigationLinks = [
+    { label: "Home", href: "#home" },
+    { label: "About Me", href: "#about" },
+    { label: "See My Work", href: "#projects" },
+    { label: "Skills", href: "#skills" },
+    { label: "Certification", href: "#certifications" },
+    { label: "Contact", href: "#contact" },
+  ];
+
+  const closeMenu = () => setMenuOpen(false);
+
+  // Close mobile menu with Escape
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape") {
@@ -21,7 +32,7 @@ export default function Navbar() {
     };
   }, []);
 
-  // Prevent background scrolling while the menu is open
+  // Prevent background scrolling while mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
 
@@ -30,20 +41,24 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
-const navigationLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About Me", href: "#about" },
-  { label: "See My Work", href: "#projects" },
-  { label: "Skills", href: "#skills" },
-  { label: "Certification", href: "#certifications" },
-  { label: "Contact", href: "#contact" },
-];
+  // Close menu if viewport changes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        setMenuOpen(false);
+      }
+    };
 
-  const closeMenu = () => setMenuOpen(false);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <>
-      <style>{`
+      <style >{`
         :root {
           --navbar-bg: #efeeeb;
           --navbar-text: #111111;
@@ -55,10 +70,6 @@ const navigationLinks = [
         html {
           scroll-behavior: smooth;
           scroll-padding-top: 100px;
-        }
-
-        body {
-          margin: 0;
         }
 
         .montasir-navbar,
@@ -73,9 +84,11 @@ const navigationLinks = [
           width: 100%;
           background: var(--navbar-bg);
           color: var(--navbar-text);
-          border-bottom: 1px solid transparent;
+          border-bottom: 1px solid var(--navbar-border);
           font-family: Arial, Helvetica, sans-serif;
         }
+
+        /* NAVBAR LAYOUT */
 
         .montasir-navbar__inner {
           width: 100%;
@@ -91,13 +104,7 @@ const navigationLinks = [
         }
 
         /* BRAND */
-.montasir-navbar__logo {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
-  display: block;
-  flex-shrink: 0;
-}
+
         .montasir-navbar__brand {
           display: inline-flex;
           align-items: center;
@@ -107,6 +114,20 @@ const navigationLinks = [
           color: var(--navbar-text);
           text-decoration: none;
           white-space: nowrap;
+        }
+
+        .montasir-navbar__logo {
+          width: 34px;
+          height: 34px;
+          object-fit: contain;
+          display: block;
+          flex-shrink: 0;
+
+          transition: transform 300ms ease;
+        }
+
+        .montasir-navbar__brand:hover .montasir-navbar__logo {
+          transform: rotate(-8deg) scale(1.06);
         }
 
         .montasir-navbar__brand-name {
@@ -120,13 +141,13 @@ const navigationLinks = [
           color: var(--navbar-accent);
         }
 
-        /* DESKTOP NAVIGATION */
+        /* DESKTOP LINKS */
 
         .montasir-navbar__links {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(20px, 3vw, 42px);
+          gap: clamp(18px, 2.5vw, 38px);
         }
 
         .montasir-navbar__link {
@@ -141,7 +162,6 @@ const navigationLinks = [
 
           font-size: 14px;
           font-weight: 500;
-          letter-spacing: 0.05px;
 
           transition: color 200ms ease;
         }
@@ -157,6 +177,7 @@ const navigationLinks = [
           background: var(--navbar-accent);
           transform: scaleX(0);
           transform-origin: right;
+
           transition: transform 250ms ease;
         }
 
@@ -180,6 +201,7 @@ const navigationLinks = [
         }
 
         .montasir-navbar__resume {
+          position: relative;
           display: inline-flex;
           justify-content: center;
           align-items: center;
@@ -202,6 +224,7 @@ const navigationLinks = [
           font-weight: 600;
 
           cursor: pointer;
+          overflow: hidden;
 
           transition:
             background 220ms ease,
@@ -230,16 +253,16 @@ const navigationLinks = [
           width: 15px;
           height: 15px;
           flex-shrink: 0;
+
           transition: transform 220ms ease;
         }
 
         .montasir-navbar__resume:hover
           .montasir-navbar__download-icon {
-          transform: translateY(2px);
+          transform: translateY(3px);
         }
 
         /* MOBILE MENU BUTTON */
-
 
         .montasir-navbar__menu-button {
           display: none;
@@ -255,11 +278,13 @@ const navigationLinks = [
           background: transparent;
           border: none;
           color: var(--navbar-text);
+
           cursor: pointer;
         }
 
         .montasir-navbar__hamburger {
           position: relative;
+          display: block;
           width: 23px;
           height: 18px;
         }
@@ -411,9 +436,20 @@ const navigationLinks = [
             font-size: clamp(17px, 4vw, 21px);
             font-weight: 500;
 
+            opacity: 0;
+            transform: translateY(8px);
+
             transition:
               color 180ms ease,
-              padding-left 180ms ease;
+              padding-left 180ms ease,
+              opacity 250ms ease,
+              transform 250ms ease;
+          }
+
+          .montasir-navbar__mobile-menu.is-open
+            .montasir-navbar__mobile-link {
+            opacity: 1;
+            transform: translateY(0);
           }
 
           .montasir-navbar__mobile-link:hover {
@@ -442,6 +478,11 @@ const navigationLinks = [
             margin-left: 30px;
           }
 
+          .montasir-navbar__logo {
+            width: 29px;
+            height: 29px;
+          }
+
           .montasir-navbar__brand-name {
             font-size: 14px;
             letter-spacing: 1px;
@@ -464,7 +505,7 @@ const navigationLinks = [
           }
         }
 
-        /* REDUCED MOTION ACCESSIBILITY */
+        /* ACCESSIBILITY */
 
         @media (prefers-reduced-motion: reduce) {
           .montasir-navbar *,
@@ -483,41 +524,52 @@ const navigationLinks = [
           aria-label="Main navigation"
         >
           {/* MOBILE HAMBURGER */}
+
           <button
             type="button"
             className={`montasir-navbar__menu-button ${
               menuOpen ? "is-open" : ""
             }`}
             onClick={() => setMenuOpen((previous) => !previous)}
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              menuOpen
+                ? "Close navigation menu"
+                : "Open navigation menu"
+            }
             aria-expanded={menuOpen}
             aria-controls="montasir-mobile-menu"
           >
-            <span className="montasir-navbar__hamburger" aria-hidden="true">
+            <span
+              className="montasir-navbar__hamburger"
+              aria-hidden="true"
+            >
               <span />
               <span />
             </span>
           </button>
 
-          {/* LOGO / BRAND */}
-         <Link
-  href="/"
-  className="montasir-navbar__brand"
-  onClick={closeMenu}
-  aria-label="Montasir homepage"
->
-  <img
-    src="/Abstract Black Arc Emblem.png"
-    alt="Montasir Logo"
-    className="montasir-navbar__logo"
-  />
+          {/* LOGO */}
 
-  <span className="montasir-navbar__brand-name">
-    MONTASIR<span className="montasir-navbar__brand-dot">.</span>
-  </span>
-</Link>
+          <Link
+            href="/"
+            className="montasir-navbar__brand"
+            onClick={closeMenu}
+            aria-label="Montasir homepage"
+          >
+            <img
+              src="/Abstract%20Black%20Arc%20Emblem.png"
+              alt="Montasir Logo"
+              className="montasir-navbar__logo"
+            />
 
-          {/* DESKTOP LINKS */}
+            <span className="montasir-navbar__brand-name">
+              MONTASIR
+              <span className="montasir-navbar__brand-dot">.</span>
+            </span>
+          </Link>
+
+          {/* DESKTOP NAVIGATION */}
+
           <div className="montasir-navbar__links">
             {navigationLinks.map((link) => (
               <Link
@@ -530,11 +582,12 @@ const navigationLinks = [
             ))}
           </div>
 
-          {/* RESUME BUTTON */}
+          {/* RESUME DOWNLOAD */}
+
           <div className="montasir-navbar__actions">
             <a
-              href="/resume.pdf"
-              download
+              href="/Montasir_Islam_Job_Market_Resume.docx"
+              download="Montasir_Islam_Resume.docx"
               className="montasir-navbar__resume"
               aria-label="Download my resume"
             >
@@ -559,6 +612,7 @@ const navigationLinks = [
         </nav>
 
         {/* MOBILE MENU */}
+
         <div
           id="montasir-mobile-menu"
           className={`montasir-navbar__mobile-menu ${
